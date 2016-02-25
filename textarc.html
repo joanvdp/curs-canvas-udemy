@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Texto en Canvas - Arcos</title>
+
+    <style>
+      canvas {
+        background: #f9f9f9;
+        border: solid #222 1px;
+      }
+    </style>
+
+  </head>
+  <body>
+    <h1>Texto en Canvas - Arcos</h1>
+    <canvas id="myCanvas" width="600" height="450"></canvas>
+    <div>
+      <form>
+        <input id="borrar" type="button" value="Borrar" />
+        <input id="grid" type="button" value="Añadir grid"/>
+      </form>
+    </div>
+
+
+  <script src="functions.js"></script>
+  <script>
+    window.onload = function () {
+      canvas = document.getElementById('myCanvas');
+      if (canvas && canvas.getContext) {
+        ctx = canvas.getContext('2d');
+        if (ctx) {
+          /*************************************
+          *************************************/
+          // Punto central del canvas
+          var centroX = canvas.width / 2;
+          var centroY = canvas.height / 2;
+
+          // Ángulo y radio
+          var angulo = Math.PI * 1.3;
+          var radio = 150;
+
+          // Cadena de texto y variables relacionadas
+          var cadena = 'No por mucho madrugar, amanece más temprano';
+          var lon = cadena.length;
+          var s = '';
+
+          ctx.font = '25px Calibri';
+          ctx.textAlign = 'center';
+          ctx.fillStyle = 'dodgerblue';
+          ctx.strokeStyle = 'navy';
+
+          ctx.save();
+
+          ctx.translate(centroX,centroY);
+          ctx.rotate(-1*angulo/2);
+          ctx.rotate(angulo / lon);
+
+          for (var i = 0; i < lon; i++) {
+            ctx.rotate(angulo/lon);
+            ctx.save();
+            ctx.translate(0,-1*radio);
+            s = cadena[i];
+            ctx.fillText(s,0,0);
+            ctx.restore();
+          }
+          ctx.restore();
+
+          /*************************************
+          *************************************/
+          borrar.onclick = function(e){
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+          }
+          grid.onclick = function(e) {
+            pintaGrid(lonGrid,lonGrid,colorGrid1,colorBg);
+            pintaRegla(lonGrid,colorGrid2,colorGrid3,0.5);
+          }
+        } else {
+          alert ('Canvas NO disponible. Sorry.')
+        }
+      }
+    }
+  </script>
+  </body>
+</html>

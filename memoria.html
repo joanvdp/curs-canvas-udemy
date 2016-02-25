@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Juego de Memoria</title>
+
+    <style>
+      body {
+        width: 960px;
+        margin: 0 auto;
+      }
+      h1 {
+        text-align: center;
+      }
+      canvas {
+        background: #f9f9f9;
+        border: solid #222 1px;
+      }
+    </style>
+
+  </head>
+  <body>
+    <h1>Juego de Memoria en Canvas</h1>
+    <canvas id="myCanvas" width="960" height="300"></canvas>
+
+  <script src="functions.js"></script>
+  <script>
+    /**********VARIABLES***********/
+    var ctx, canvas;
+    var colorAtras = 'cornflowerblue';
+
+    /**********FUNCIONES***********/
+    function Carta(x,y,ancho,largo,info) {
+      this.x = x;
+      this.y = y;
+      this.ancho = ancho;
+      this.largo = largo;
+      this.info = info;
+      this.dibuja = dibujaCarta;
+    }
+
+    function dibujaCarta(){
+      ctx.fillStyle = colorAtras;
+      ctx.fillRect(this.x, this.y,this.ancho,this.largo);
+    }
+
+    function tablero(){
+      var i;
+      var carta;
+      var x = inicioX;
+      var y = inicioY;
+      
+    }
+
+    /**********SCRIPT***********/
+    window.onload = function () {
+      canvas = document.getElementById('myCanvas');
+      if (canvas && canvas.getContext) {
+        ctx = canvas.getContext('2d');
+        if (ctx) {
+          /*************************************
+          *************************************/
+
+
+
+
+
+
+          /*************************************
+          *************************************/
+        } else {
+          alert ('Canvas NO disponible. Sorry.')
+        }
+      }
+    }
+  </script>
+  </body>
+</html>

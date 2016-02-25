@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Canvas - Mini Paint</title>
+
+    <style>
+      canvas {
+        background: #f9f9f9;
+        border: solid #222 1px;
+      }
+    </style>
+
+  </head>
+  <body>
+    <h1>Mini Paint</h1>
+    <canvas id="myCanvas" width="600" height="450"></canvas>
+    <div>
+      <form>
+        <label for="color">Color:</label>
+        <select id="color">
+          <option value="crimson">Red</option>
+          <option value="forestgreen">Green</option>
+          <option value="dodgerblue">Blue</option>
+          <option value="black">Black</option>
+          <option value="gold">Yellow</option>
+        </select>
+        <label for="linea">Línea:</label>
+        <select id="linea">
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+        </select>
+        <input id="borrar" type="button" value="Borrar" />
+        <input id="grid" type="button" value="Añadir grid"/>
+      </form>
+    </div>
+
+
+  <script src="functions.js"></script>
+  <script>
+    // Variables pintar
+    var pos = {}; //Variable pública para posición de canvas en el documento
+    var flag = false; // Variable para almacenar estado de pintar/no pintar
+    var colorSelect = document.getElementById('color');
+    var lineaSelect = document.getElementById('linea');
+    var borrar = document.getElementById('borrar');
+    var grid = document.getElementById('grid');
+
+    function dibujaRecta(inicio, fin){
+      ctx.beginPath();
+      ctx.moveTo(inicio.x, inicio.y);
+      ctx.lineTo(fin.x, fin.y);
+      ctx.stroke();
+    }
+
+
+    window.onload = function () {
+      canvas = document.getElementById('myCanvas');
+      if (canvas && canvas.getContext) {
+        ctx = canvas.getContext('2d');
+        if (ctx) {
+
+            canvas.onmousedown = function(e) {
+              pos = ajustaCoord('myCanvas',e.clientX, e.clientY);
+              flag = true;
+            }
+
+            canvas.onmouseup = function(e) {
+              flag = false;
+            }
+
+            canvas.onmousemove = function(e) {
+              if (flag) {
+                var fin = ajustaCoord('myCanvas',e.clientX, e.clientY);
+                dibujaRecta(pos,fin);
+                pos = fin;
+              }
+            }
+
+            borrar.onclick = function(e){
+              ctx.clearRect(0,0,canvas.width,canvas.height);
+            }
+            colorSelect.onchange = function(e){
+              ctx.strokeStyle = colorSelect.value;
+            }
+            lineaSelect.onchange = function(e){
+              ctx.lineWidth = lineaSelect.value;
+            }
+
+            grid.onclick = function(e) {
+              pintaGrid('myCanvas',lonGrid,lonGrid,colorGrid1,colorBg);
+              pintaRegla('myCanvas',lonGrid,colorGrid2,colorGrid3,0.5);
+            }
+
+            /*Valores iniciales*/
+            ctx.strokeStyle = colorSelect.value;
+            ctx.lineWidth = lineaSelect.value;
+
+        } else {
+          alert ('Canvas NO disponible. Sorry.')
+        }
+      }
+    }
+
+  </script>
+
+  </body>
+</html>
