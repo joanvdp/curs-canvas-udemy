@@ -23,13 +23,24 @@
   </head>
   <body>
     <h1>Juego de Memoria en Canvas</h1>
-    <canvas id="myCanvas" width="960" height="300"></canvas>
+    <canvas id="myCanvas" width="960" height="450"></canvas>
 
   <script src="functions.js"></script>
   <script>
     /**********VARIABLES***********/
     var ctx, canvas;
+    var primerCarta = true;
+    var cartaPrimera, cartaSegunda;
+    var colorDelante = 'tomato';
     var colorAtras = 'cornflowerblue';
+    var colorCanvas = '#f9f9f9';
+    var inicioX = 45;
+    var inicioY = 50;
+    var cartaMargen = 30;
+    var cartaLong = 30 ;
+    var cartaAncho = cartaLong * 4 ;
+    var cartaLargo = cartaLong * 4 ;
+    var cartas_array = new Array();
 
     /**********FUNCIONES***********/
     function Carta(x,y,ancho,largo,info) {
@@ -51,9 +62,78 @@
       var carta;
       var x = inicioX;
       var y = inicioY;
-      
+      for (i = 1; i<6+1; i++){
+        carta = new Carta(x,y,cartaAncho,cartaLargo,i);
+        cartas_array.push(carta);
+        carta.dibuja();
+        // Carta de pareja
+        carta = new Carta(x,y+cartaAncho+cartaMargen,cartaAncho,cartaLargo,i);
+        cartas_array.push(carta);
+        carta.dibuja();
+        // Aumentamos el valor de X
+        x += cartaAncho + cartaMargen;
+      }
+    }
+    function barajar(){
+      var i, j, k;
+      var temp;
+      var long = cartas_array.length;
+      for (j = 0; j < long * 3; j++) {
+        i = Math.floor(Math.random()*long);
+        k = Math.floor(Math.random()*long);
+        //
+        temp = cartas_array[i].info;
+        //
+        cartas_array[i].info = cartas_array[k].info;
+        cartas_array[k].info = temp;
+      }
     }
 
+    function ajusta(xx, yy) {
+      var posCanvas = canvas.getBoundingClientRect();
+      var x = xx - posCanvas.left;
+      var y = yy - posCanvas.top;
+      return {x:x,y:y};
+    }
+
+    function selecciona(e) {
+      var pos = ajusta(e.clientX, e.clientY);
+      for (var i = 0; i<cartas_array.length; i++) {
+        var carta = cartas_array[i];
+        if (carta.x > 0) {
+          if  ((pos.x > carta.x) &&
+              (pos.x < carta.x+carta.ancho) &&
+              (pos.y > carta.y) &&
+              (pos.y < carta.y+carta.largo)) {
+              if((primerCarta) || (i!=cartaPrimera)) break;
+          }
+        }
+      }
+      if(i < cartas_array.length) {
+        if(primerCarta) {
+          cartaPrimera = i;
+          primerCarta = false;
+          pinta(carta);
+        } else {
+          cartaSegunda = i;
+          pinta(carta);
+          primerCarta = true;
+          setTimeout(volteaCarta,1000);
+        }
+      }
+    }
+    function pinta(carta) {
+      ctx.fillStyle = colorDelante;
+      ctx.fillRect(carta.x,carta.y,carta.ancho, carta.largo);
+      ctx.font = 'bold 40px Comic';
+      ctx.fillStyle = 'gold';
+      ctx.fillText(String(carta.info), carta.x+carta.ancho/2-10,carta.y+carta.largo/2+10);
+    }
+
+    function volteaCarta(){
+      cartas_array[cartaPrimera].dibuja();
+      cartas_array[cartaSegunda].dibuja();
+    }
     /**********SCRIPT***********/
     window.onload = function () {
       canvas = document.getElementById('myCanvas');
@@ -62,8 +142,9 @@
         if (ctx) {
           /*************************************
           *************************************/
-
-
+          canvas.addEventListener('click', selecciona, false);
+          tablero();
+          barajar();
 
 
 
