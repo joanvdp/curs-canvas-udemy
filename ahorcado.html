@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Ahorcado en Canvas</title>
+
+    <style>
+      canvas {
+        background: #f9f9f9;
+        border: solid #222 1px;
+      }
+    </style>
+
+  </head>
+  <body>
+    <h1>Ahorcado en Canvas</h1>
+    <canvas id="myCanvas" width="960" height="450"></canvas>
+
+  <script>
+  /*******Variables**********/
+  var ctx, canvas, palabra;
+  var letras = 'QWERTYUIOPASDFGHJKLÑZXCVBNM';
+  var colorTecla = '#222222';
+  var colorMargen = '#444444';
+  var inicioX = 200;
+  var inicioY = 300;
+  var lon = 35;
+  var margen = 20;
+
+  //Arreglos
+  var teclas_array = new Array();
+  var letras_array = new Array();
+  var palabras_array = new Array();
+
+  //Variables de control
+  var aciertos = 0;
+  var errores = 0;
+
+  // Palabras
+  palabras_array.push('PEGASO');
+  palabras_array.push('AFRODITA');
+  palabras_array.push('ATENEA');
+  palabras_array.push('HARES');
+  palabras_array.push('CRONOS');
+  palabras_array.push('HERMES');
+  palabras_array.push('DIONISIO');
+  palabras_array.push('PERSEO');
+  palabras_array.push('POSEIDON');
+  palabras_array.push('APOLO');
+
+  // Objetos
+  function Tecla(x,y,ancho,alto,letra) {
+    this.x = x;
+    this.y = y;
+    this.ancho = ancho;
+    this.alto = alto;
+    this.letra = letra;
+    this.dibuja = dibujaTecla;
+  }
+
+  function Letra(x,y,ancho,alto,letra) {
+    this.x = x;
+    this.y = y;
+    this.ancho = ancho;
+    this.alto = alto;
+    this.letra = letra;
+    this.dibuja = dibujaCajaLetra;
+    this.dibujaLetra = dibujaLetraLetra;
+  }
+
+  // Métodos de los objetos
+  function dibujaTecla(){
+    ctx.fillStyle = colorTecla;
+    ctx.strokeStyle = colorMargen;
+    ctx.lineWidth = 2;
+    ctx.fillRect(this.x, this.y, this.ancho, this.alto);
+    ctx.strokeRect(this.x, this.y, this.ancho, this.alto);
+    //
+    ctx.fillStyle = "white";
+    ctx.font = 'bold 20px Courier';
+    ctx.fillText(this.letra, this.x+this.ancho/2-5, this.y+this.alto/2+5);
+  }
+
+  function dibujaCajaLetra(){
+    ctx.fillStyle = 'white';
+    ctx.strokeStyle = colorTecla;
+    ctx.lineWidth = 2;
+    ctx.fillRect(this.x, this.y, this.ancho, this.alto);
+    ctx.strokeRect(this.x, this.y, this.ancho, this.alto);
+  }
+
+  function dibujaLetraLetra(){
+    ctx.fillStyle = colorTecla;
+    ctx.font = 'bold 40px Courier';
+    ctx.fillText(this.letra, this.x+this.ancho/2-11, this.y+this.alto/2+12);
+  }
+
+  /*******Funciones**********/
+  function teclado(){
+    var ren = 0;
+    var col = 0;
+    var letra = '';
+    var miTecla;
+    var x = inicioX;
+    var y = inicioY;
+
+    for(var i = 0; i < letras.length; i++) {
+      letra = letras.substr(i,1);
+      miTecla = new Tecla(x,y,lon,lon,letra);
+      miTecla.dibuja();
+      teclas_array.push(miTecla);
+      // Incrementos
+      x += lon + margen;
+      col++;
+      if(col == 10) {
+        col = 0;
+        ren++;
+        if (ren == 2) {
+          x = 280;
+        } else {
+          x = inicioX;
+        }
+      }
+      y = inicioY + ren * 50;
+    }
+  }
+
+  function pintaPalabra(){
+    var p = Math.floor(Math.random()*palabras_array.length);
+    palabra = palabras_array[p];
+    var ren = 0;
+    var col = 0;
+    var y = 230;
+    var lon = 50;
+    var x = (canvas.width - (lon + margen) * palabra.length)/2;
+
+    for(var i = 0; i < palabra.length; i++) {
+      letra = palabra.substr(i,1);
+      miLetra = new Letra(x,y,lon,lon,letra);
+      miLetra.dibuja();
+      letras_array.push(miLetra);
+      x += lon + margen;
+    }
+
+  }
+
+  function cadalso(errores) {
+    var imagen = new Image();
+    imagen.src = 'img/ahorcado/ahorcado'+errores+'.png';
+    imagen.onload = function(){
+      ctx.drawImage(imagen,390,20,115,195);
+    }
+  }
+
+  function ajusta(xx, yy) {
+    var posCanvas = canvas.getBoundingClientRect();
+    var x = xx - posCanvas.left;
+    var y = yy - posCanvas.top;
+    return {x:x,y:y};
+  }
+
+  function selecciona(e) {
+    var pos = ajusta(e.clientX,e.clientY);
+    var x = pos.x;
+    var y = pos.y;
+    var tecla;
+    var bandera = false;
+    for(var i = 0; i < teclas_array.length; i++){
+      tecla = teclas_array[i];
+      if(tecla.x > 0) {
+        if((x > tecla.x) && (x < tecla.x + tecla.ancho) && (y > tecla.y) && (y < tecla.y + tecla.alto)) {
+          break;
+        }
+      }
+    }
+    if (i < teclas_array.length) {
+      for (var i = 0; i<palabra.length; i++) {
+        letra = palabra.substr(i,1);
+        if (letra == tecla.letra) {
+          caja = letras_array[i];
+          caja.dibujaLetra();
+          aciertos++;
+          bandera = true;
+        }
+      }
+      if (bandera == false) {
+        errores++;
+        cadalso(errores);
+        if (errores == 5) gameOver(errores);
+      }
+      // Borrar la tecla pulsada
+      ctx.clearRect(tecla.x - 2, tecla.y - 2, tecla.ancho+3, tecla.alto+3);
+      tecla.x = -1;
+      if (aciertos == palabra.length) gameOver(errores);
+    }
+  }
+
+  function gameOver(errores) {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.fillStyle = colorTecla;
+    ctx.font = 'bold 50px Courier';
+    if (errores < 5) {
+        ctx.fillText('Perfecto! Palabra resuelta', 110, 280);
+    } else {
+        ctx.fillText('Has perdido! La palabra era ', 110, 280);
+    }
+    ctx.font = 'bold 80px Courier';
+    lon = (canvas.width - (palabra.length * 48))/2;
+    ctx.fillText(palabra,lon,380);
+    cadalso(errores);
+  }
+
+  /*******  Script **********/
+    window.onload = function () {
+      canvas = document.getElementById('myCanvas');
+      if (canvas && canvas.getContext) {
+        ctx = canvas.getContext('2d');
+        if (ctx) {
+          /*************************************
+          *************************************/
+          teclado();
+          pintaPalabra();
+          cadalso(errores);
+          // Listeners
+          canvas.addEventListener('click',selecciona,false);
+          /*************************************
+          *************************************/
+        } else {
+          alert ('Canvas NO disponible. Sorry.')
+        }
+      }
+    }
+  </script>
+  </body>
+</html>
