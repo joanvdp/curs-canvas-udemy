@@ -41,6 +41,8 @@
     var cartaAncho = cartaLong * 4 ;
     var cartaLargo = cartaLong * 4 ;
     var cartas_array = new Array();
+    var iguales = false;
+    var cartas = 0;
 
     /**********FUNCIONES***********/
     function Carta(x,y,ancho,largo,info) {
@@ -118,6 +120,14 @@
           cartaSegunda = i;
           pinta(carta);
           primerCarta = true;
+          // Comparación
+          if (cartas_array[cartaPrimera].info == cartas_array[cartaSegunda].info) {
+              iguales = true;
+              cartas++;
+              aciertos();
+          } else {
+              iguales = false;
+          }
           setTimeout(volteaCarta,1000);
         }
       }
@@ -131,9 +141,31 @@
     }
 
     function volteaCarta(){
-      cartas_array[cartaPrimera].dibuja();
-      cartas_array[cartaSegunda].dibuja();
+        if(iguales == false) {
+            cartas_array[cartaPrimera].dibuja();
+            cartas_array[cartaSegunda].dibuja();
+        } else {
+            ctx.clearRect(cartas_array[cartaPrimera].x,cartas_array[cartaPrimera].y,cartas_array[cartaPrimera].ancho,cartas_array[cartaPrimera].largo);
+            ctx.clearRect(cartas_array[cartaSegunda].x,cartas_array[cartaSegunda].y,cartas_array[cartaSegunda].ancho,cartas_array[cartaSegunda].largo);
+            cartas_array[cartaPrimera].x = -1;
+            cartas_array[cartaSegunda].x = -1;
+        }
     }
+    function aciertos(){
+        ctx.save();
+        ctx.fillStyle = 'cornflowerblue';
+        if(cartas==6) {
+            ctx.font = 'bold 80px Comic';
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+            ctx.fillText('Juego Terminado!',200,220);
+        } else {
+            ctx.clearRect(0,340,canvas.width/2,100);
+            ctx.font = 'bold 40px Comic';
+            ctx.fillText('Aciertos: '+String(cartas),30,380);
+            ctx.restore();
+        }
+    }
+
     /**********SCRIPT***********/
     window.onload = function () {
       canvas = document.getElementById('myCanvas');
@@ -145,10 +177,7 @@
           canvas.addEventListener('click', selecciona, false);
           tablero();
           barajar();
-
-
-
-
+          aciertos();
           /*************************************
           *************************************/
         } else {
