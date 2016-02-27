@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Juego del gato en canvas</title>
+    <style>
+      canvas {
+        background: #f9f9f9;
+        border: solid #222 1px;
+      }
+    </style>
+
+  </head>
+  <body>
+    <h1>Juego del gato en canvas</h1>
+    <canvas id="myCanvas" width="960" height="500"></canvas>
+
+  <script src="functions.js"></script>
+  <script>
+    /********variables**********/
+    var ctx, canvas;
+    var fichas_array = new Array();
+    var COLUMNAS = 3;
+    var FILAS = 3;
+    var fichas_X = 0;
+    var fichas_O = 0;
+    var tiradas = 0;
+    var gameOver = false;
+    var largo = 120;
+    var colorGato = '#222222';
+    var colorCanvas = '#f9f9f9';
+
+    /********objetos************/
+    function Ficha(x,y,w,h,i,fila,col) {
+      this.x = x;
+      this.y = y;
+      this.w = w;
+      this.h = h;
+      this.i = i;
+      this.fila = fila;
+      this.col = col;
+      this.peso = 0;
+      this.valor = "";
+      this.pinta = pintaFicha;
+    }
+
+    /********métodos************/
+    function pintaFicha(valor){
+      this.valor = valor;
+      ctx.font = 'bold 100px Arial';
+      ctx.fillStyle = colorGato;
+      ctx.fillText(valor,this.x+30,this.y+100,this.w,this.h);
+    }
+
+    /********funciones**********/
+    // Creación de tablero y posiciones de ficha
+    function gato(){
+      ctx.fillStyle = colorCanvas;
+      ctx.strokeStyle = colorGato;
+      ctx.lineWidth = 20;
+      // Grid de casillas
+      ctx.beginPath();
+      ctx.moveTo(410,20);
+      ctx.lineTo(410,420);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(550,20);
+      ctx.lineTo(550,420);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(280,150);
+      ctx.lineTo(680,150);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(280,290);
+      ctx.lineTo(680,290);
+      ctx.stroke();
+      // Borde del tablero
+      ctx.lineWidth = 1;
+      ctx.strokeRect(280,20,400,400);
+      // Fichas
+      // Fila 1
+      fichas_array.push(new Ficha(280,20,largo,largo,0,0,0));
+      fichas_array.push(new Ficha(420,20,largo,largo,1,0,1));
+      fichas_array.push(new Ficha(560,20,largo,largo,2,0,2));
+      // Fila 2
+      fichas_array.push(new Ficha(280,160,largo,largo,3,1,0));
+      fichas_array.push(new Ficha(420,160,largo,largo,4,1,1));
+      fichas_array.push(new Ficha(560,160,largo,largo,5,1,2));
+      // Fila 3
+      fichas_array.push(new Ficha(280,300,largo,largo,6,2,0));
+      fichas_array.push(new Ficha(420,300,largo,largo,7,2,1));
+      fichas_array.push(new Ficha(560,300,largo,largo,8,2,2));
+    }
+
+    // Impresión de mensajes del juego
+    function mensaje(cadena){
+      var lon = (canvas.width-(20*cadena.length))/2;
+      ctx.strokeStyle = colorGato;
+      ctx.clearRect(0,420,canvas.width,100);
+      ctx.font = 'bold 40px Courier';
+      ctx.fillText(cadena,lon-33,470);
+    }
+
+    // Ajusta coordenadas del click dentro del canvas
+    function ajusta(xx, yy) {
+      var posCanvas = canvas.getBoundingClientRect();
+      var x = xx - posCanvas.left;
+      var y = yy - posCanvas.top;
+      return {x:x,y:y};
+    }
+
+
+    // Selección de casilla por parte del jugador
+    function selecciona(e) {
+      //desactivamos listener para evitar nuevos clicks
+      canvas.removeEventListener('click',selecciona,false);
+
+      //obtenemos posición de casilla pinchada
+      var pos = ajusta(e.clientX,e.clientY);
+      var x = pos.x;
+      var y = pos.y;
+      var ficha;
+
+      //verificamos casilla seleccionada por el jugador
+      for(var i = 0; i < fichas_array.length; i++) {
+        ficha = fichas_array[i];
+        if((x > ficha.x)&&(x < ficha.x+ficha.w) && (y > ficha.y) && (y < ficha.y + ficha.h)) {
+          if(ficha.valor == '') {
+            tiradas++;
+            break;
+          }
+        }
+      }
+      //Si se encontró la ficha pulsada
+      if(i < fichas_array.length) {
+        if(ficha.valor == ''){
+          ficha.pinta('X');
+          //cambiamos mensaje para jugada de la máquina
+          mensaje('Pensando jugada...');
+          setTimeout(tiraMaquina,1000);
+        }
+      }
+    }
+
+    // Funciones de verificación para jugadas de máquina
+    function verificaFilas(calculaPeso) {
+      if(gameOver==false) {
+        for(i = 0; i < FILAS; i++) {
+          fichas_X = 0;
+          fichas_O = 0;
+          for (j = 0; j < COLUMNAS; j++) {
+            ficha = buscaFicha(i,j);
+            fichas_X += (ficha.valor=='X'?1:0);
+            fichas_O += (ficha.valor=='O'?1:0);
+          }
+          // console.log('REN- '+i+' X '+fichas_X+', O '+fichas_O);
+          if(calculaPeso) {
+            for(j = 0; j < COLUMNAS; j++) {
+              ficha = buscaFicha(i,j);
+              pesoFicha(ficha.i,fichas_O,fichas_X);
+              // console.log('Ficha '+ficha.i+' peso -> '+ficha.peso);
+            }
+          }
+          gameOver = verificaFin(fichas_O,fichas_X);
+          if(gameOver) break;
+        }
+      }
+    }
+
+    // Funcion de cálculo valor jugada
+    function pesoFicha(i,fichas_O,fichas_X){
+      ficha = fichas_array[i];
+      if(ficha.valor ==''){
+        if(fichas_O == 2 && fichas_X == 0) {
+          ficha.peso += 10;
+        } else if (fichas_O == 0 && fichas_X == 2) {
+          ficha.peso += 6;
+        } else if (fichas_O == 1 && fichas_X == 0) {
+          ficha.peso += 3;
+        } else {
+          ficha.peso += 1;
+        }
+      } else {
+        ficha.peso = 0;
+      }
+    }
+
+    // Verifica si existe 3 en raya
+    function verificaFin(O,X) {
+      var fin = false;
+      if(X == 3) {
+        fin = true;
+        mensaje('Has ganado!');
+      }
+      if(O == 3) {
+        fin == true;
+        mensaje('Has perdido!');
+      }
+      return fin;
+    }
+
+    // Localiza ficha
+    function buscaFicha(fila,col) {
+      for(var i = 0; i < fichas_array.length; i++) {
+        ficha = fichas_array[i];
+        if(ficha.fila == fila && ficha.col == col) {
+          break;
+        }
+      }
+      return ficha;
+    }
+
+
+
+    // Jugadas de la máquina
+    function tiraMaquina(){
+      tiradas++;
+      if(gameOver==false){
+        // Verificar peso de casillas para valorar jugada
+        verificaFilas(true);
+        // verificaColumnas(true);
+        // verificaDiagonal1(true);
+        // verificaDiagonal2(true);
+        // Selecciona mejor jugada
+
+        // Realiza la jugada
+
+        // Verificar jugada de la máquina
+        // verificaFilas(false);
+        // verificaColumnas(false);
+        // verificaDiagonal1(false);
+        // verificaDiagonal2(false);
+
+        //Verifica fin del juego
+        if (gameOver == false) {
+          if(tiradas < 9) {
+            canvas.addEventListener('click',selecciona,false);
+            mensaje('Tu Turno');
+          } else {
+            mensaje('Empate!');
+          }
+        }
+      }
+    }
+
+
+    /********script*************/
+    window.onload = function () {
+      canvas = document.getElementById('myCanvas');
+      if (canvas && canvas.getContext) {
+        ctx = canvas.getContext('2d');
+        if (ctx) {
+          /*************************************
+          *************************************/
+          mensaje('Realiza tu jugada');
+          gato();
+
+          // Eventos
+          canvas.addEventListener('click',selecciona,false);
+
+          /*************************************
+          *************************************/
+        } else {
+          alert ('Canvas NO disponible. Sorry.')
+        }
+      }
+    }
+  </script>
+  </body>
+</html>
