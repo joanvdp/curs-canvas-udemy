@@ -159,18 +159,79 @@
             fichas_X += (ficha.valor=='X'?1:0);
             fichas_O += (ficha.valor=='O'?1:0);
           }
-          // console.log('REN- '+i+' X '+fichas_X+', O '+fichas_O);
           if(calculaPeso) {
             for(j = 0; j < COLUMNAS; j++) {
               ficha = buscaFicha(i,j);
               pesoFicha(ficha.i,fichas_O,fichas_X);
-              // console.log('Ficha '+ficha.i+' peso -> '+ficha.peso);
             }
           }
           gameOver = verificaFin(fichas_O,fichas_X);
           if(gameOver) break;
         }
       }
+    }
+    function verificaColumnas(calculaPeso){
+        if(gameOver == false) {
+            for(var j = 0; j < COLUMNAS; j++) {
+                fichas_X = 0;
+                fichas_O = 0;
+                for (var i = 0; i < FILAS; i++) {
+                    ficha = buscaFicha(i,j);
+                    fichas_X += (ficha.valor=='X'?1:0);
+                    fichas_O += (ficha.valor=='O'?1:0);
+                }
+                if(calculaPeso) {
+                  for(i = 0; i < FILAS; i++) {
+                    ficha = buscaFicha(i,j);
+                    pesoFicha(ficha.i,fichas_O,fichas_X);
+                  }
+                }
+                gameOver = verificaFin(fichas_O,fichas_X);
+                if(gameOver) break;
+            }
+        }
+    }
+
+    function verificaDiagonal1(calculaPeso) {
+        if(gameOver == false) {
+            fichas_X = 0;
+            fichas_O = 0;
+            for (var i = 0; i < FILAS; i++) {
+                ficha = buscaFicha (i,i);
+                fichas_X += (ficha.valor=='X'?1:0);
+                fichas_O += (ficha.valor=='O'?1:0);
+            }
+            if(calculaPeso) {
+              for(i = 0; i < FILAS; i++) {
+                ficha = buscaFicha(i,i);
+                pesoFicha(ficha.i,fichas_O,fichas_X);
+              }
+            }
+            gameOver = verificaFin(fichas_O,fichas_X);
+        }
+    }
+
+    function verificaDiagonal2(calculaPeso) {
+        if(gameOver == false) {
+            fichas_X = 0;
+            fichas_O = 0;
+            j = 2;
+            for (var i = 0; i < FILAS; i++) {
+                ficha = buscaFicha (i,j);
+                fichas_X += (ficha.valor=='X'?1:0);
+                fichas_O += (ficha.valor=='O'?1:0);
+                j--;
+            }
+            if(calculaPeso) {
+              j = 2;
+              for(i = 0; i < FILAS; i++) {
+                ficha = buscaFicha(i,j);
+                pesoFicha(ficha.i,fichas_O,fichas_X);
+                j--;
+              }
+            }
+            gameOver = verificaFin(fichas_O,fichas_X);
+        }
     }
 
     // Funcion de cálculo valor jugada
@@ -199,7 +260,7 @@
         mensaje('Has ganado!');
       }
       if(O == 3) {
-        fin == true;
+        fin = true;
         mensaje('Has perdido!');
       }
       return fin;
@@ -224,18 +285,32 @@
       if(gameOver==false){
         // Verificar peso de casillas para valorar jugada
         verificaFilas(true);
-        // verificaColumnas(true);
-        // verificaDiagonal1(true);
-        // verificaDiagonal2(true);
+        verificaColumnas(true);
+        verificaDiagonal1(true);
+        verificaDiagonal2(true);
+
         // Selecciona mejor jugada
+        var mejorJugada = 0;
+        for (var i = 0; i < fichas_array.length; i++) {
+            ficha = fichas_array[i];
+            if (ficha.peso > mejorJugada) {
+                mejorJugada = ficha.peso;
+                ii = i;
+            }
+        }
 
         // Realiza la jugada
+        ficha = fichas_array[ii];
+        ficha.pinta('O');
+        //console.log('Mejor jugada: '+ ficha.fila+', '+ficha.col+' - '+ficha.i);
+        //console.log('------------------------------------------------------');
+
 
         // Verificar jugada de la máquina
-        // verificaFilas(false);
-        // verificaColumnas(false);
-        // verificaDiagonal1(false);
-        // verificaDiagonal2(false);
+        verificaFilas(false);
+        verificaColumnas(false);
+        verificaDiagonal1(false);
+        verificaDiagonal2(false);
 
         //Verifica fin del juego
         if (gameOver == false) {
