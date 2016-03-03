@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Buscaminas en canvas</title>
+
+    <style>
+      canvas {
+        background: #333;
+        border: solid #222 1px;
+      }
+    </style>
+
+  </head>
+  <body>
+    <h1>Buscaminas en canvas</h1>
+    <canvas id="myCanvas" width="960" height="500"></canvas>
+
+  <script>
+  /**********************
+        VARIABLES
+  ***********************/
+  var canvas, ctx;
+  var COLUMNAS = 10;
+  var FILAS = 10;
+  var TODAS = COLUMNAS * FILAS;
+  var MINAS = COLUMNAS * 2;
+  var VECINOS = 8;
+  var MATRIZ_FILA = 20;
+  var MATRIZ_COL = 320;
+  var ACHO_CUADRO = 40;
+
+  // Marcador
+  var numeroMinas = 0;
+  var minasEncontradas = 0;
+  var minasMarcadas = 0;
+
+  // Estados
+  var CUBIERTO = 0;
+  var DESCUBIERTO = 1;
+  var MARCA_MINA = 2;
+  var BOMBA = 9;
+  var OK = 14;
+
+  // Colores tablero
+  var colorTecla = 'slategray';
+  var colorMargen = 'snow';
+  var colorVoltea = 'steelblue';
+
+  // Arrays contenedores
+  var celdas_array = new Array();
+
+  // Marcas
+  var banderaMarca;
+
+  /**********************
+        OBJETOS
+  ***********************/
+  function Celda(fila, col, x, y, w, h, i, minas, estado) {
+      this.fila = fila;
+      this.col = col;
+      this.x = x;
+      this.y = y;
+      this.w = w;
+      this.h = h;
+      this.i = i;
+      this.minas = minas;
+      this.estado = estado;
+      //
+      this.dibuja = dibujaCelda;
+      this.voltea = volteaCelda;
+      this.marca = marcaCelda;
+  }
+
+  function Bandera() {
+      this.x = 610;
+      this.y = 445;
+      this.w = 280;
+      this.h = 30;
+      this.estado = false;
+  }
+
+  /**********************
+        MÉTODOS
+  ***********************/
+  function dibujaCelda() {
+      ctx.save();
+      ctx.fillStyle = colorTecla;
+      ctx.strokeStyle = colorMargen;
+      ctx.fillRect(this.x,this.y,this.w,this.h);
+      ctx.strokeRect(this.x,this.y,this.w,this.h);
+      ctx.restore();
+  }
+
+  function volteaCelda(){
+
+  }
+
+  function marcaCelda(){
+
+  }
+
+
+  /**********************
+        FUNCIONES
+  ***********************/
+
+
+
+  /**********************
+        SCRIPT
+  ***********************/
+
+    window.onload = function () {
+      canvas = document.getElementById('myCanvas');
+      if (canvas && canvas.getContext) {
+        ctx = canvas.getContext('2d');
+        if (ctx) {
+          /*************************************
+          *************************************/
+
+
+
+
+
+
+          /*************************************
+          *************************************/
+          borrar.onclick = function(e){
+            ctx.clearRect(0,0,canvas.width,canvas.height);
+          }
+          grid.onclick = function(e) {
+            pintaGrid(lonGrid,lonGrid,colorGrid1,colorBg);
+            pintaRegla(lonGrid,colorGrid2,colorGrid3,0.5);
+          }
+        } else {
+          alert ('Canvas NO disponible. Sorry.')
+        }
+      }
+    }
+  </script>
+  </body>
+</html>
