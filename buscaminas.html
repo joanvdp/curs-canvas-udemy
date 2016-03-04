@@ -30,28 +30,23 @@
   var VECINOS = 8;
   var MATRIZ_FILA = 20;
   var MATRIZ_COL = 320;
-  var ACHO_CUADRO = 40;
-
+  var ANCHO_CUADRO = 40;
   // Marcador
   var numeroMinas = 0;
   var minasEncontradas = 0;
   var minasMarcadas = 0;
-
   // Estados
   var CUBIERTO = 0;
   var DESCUBIERTO = 1;
   var MARCA_MINA = 2;
   var BOMBA = 9;
   var OK = 14;
-
   // Colores tablero
   var colorTecla = 'slategray';
   var colorMargen = 'snow';
   var colorVoltea = 'steelblue';
-
   // Arrays contenedores
   var celdas_array = new Array();
-
   // Marcas
   var banderaMarca;
 
@@ -106,13 +101,54 @@
   /**********************
         FUNCIONES
   ***********************/
+  function tablero(){
+      banderaMarca = new Bandera();
+      MATRIZ_COL = (canvas.width - (COLUMNAS * ANCHO_CUADRO))/2;
+      for (var i = 0; i < FILAS; i++) {
+          for (var j = 0; j < COLUMNAS; j++) {
+              // Generamos número de celda
+              ii = j + i * FILAS;
+              // Coordenadas celda
+              x = MATRIZ_COL + j * ANCHO_CUADRO;
+              y = MATRIZ_FILA + i * ANCHO_CUADRO;
+              // Creamos celda
+              var celda = new Celda(i, j, x, y, ANCHO_CUADRO, ANCHO_CUADRO, ii, 0, 0);
+              // Almacenamos celda creada en array de celdas
+              celdas_array.push(celda);
+              // Pintamos celda
+              celda.dibuja();
+          }
+      }
+  }
+  // Ajuste de coordenadas obtenidas en listener
+  function ajusta(xx, yy) {
+    var posCanvas = canvas.getBoundingClientRect();
+    var x = xx - posCanvas.left;
+    var y = yy - posCanvas.top;
+    return {x:x,y:y};
+  }
 
+  function selecciona(e) {
+      var pos = ajusta(e.clientX, e.clientY);
+      var x = pos.x;
+      var y = pos.y;
+      var celda;
+
+      for (var i = 0; i < celdas_array.length; i++) {
+          celda = celdas_array[i];
+          if ((x > celda.x)&&(x < celda.x+celda.w)&&(y > celda.y)&&(y < celda.y + celda.h)) {
+              break;
+          }
+      }
+      if(i < celdas_array.length) {
+          alert(celda.i);
+      }
+  }
 
 
   /**********************
         SCRIPT
   ***********************/
-
     window.onload = function () {
       canvas = document.getElementById('myCanvas');
       if (canvas && canvas.getContext) {
@@ -120,21 +156,12 @@
         if (ctx) {
           /*************************************
           *************************************/
+          tablero();
 
-
-
-
-
-
+          // Listeners
+          canvas.addEventListener('click',selecciona,false);
           /*************************************
           *************************************/
-          borrar.onclick = function(e){
-            ctx.clearRect(0,0,canvas.width,canvas.height);
-          }
-          grid.onclick = function(e) {
-            pintaGrid(lonGrid,lonGrid,colorGrid1,colorBg);
-            pintaRegla(lonGrid,colorGrid2,colorGrid3,0.5);
-          }
         } else {
           alert ('Canvas NO disponible. Sorry.')
         }

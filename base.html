@@ -17,16 +17,35 @@
   <body>
     <h1></h1>
     <canvas id="myCanvas" width="600" height="450"></canvas>
-    <div>
-      <form>
-        <input id="borrar" type="button" value="Borrar" />
-        <input id="grid" type="button" value="Añadir grid"/>
-      </form>
-    </div>
 
 
   <script src="functions.js"></script>
   <script>
+    /******************************
+    Variables
+    ******************************/
+
+
+    /******************************
+    Objetos
+    ******************************/
+
+
+    /******************************
+    Métodos
+    ******************************/
+
+
+    /******************************
+    Funciones
+    ******************************/
+
+
+    /******************************
+    Script
+    ******************************/
+
+
     window.onload = function () {
       canvas = document.getElementById('myCanvas');
       if (canvas && canvas.getContext) {
@@ -37,18 +56,8 @@
 
 
 
-
-
-
           /*************************************
           *************************************/
-          borrar.onclick = function(e){
-            ctx.clearRect(0,0,canvas.width,canvas.height);
-          }
-          grid.onclick = function(e) {
-            pintaGrid(lonGrid,lonGrid,colorGrid1,colorBg);
-            pintaRegla(lonGrid,colorGrid2,colorGrid3,0.5);
-          }
         } else {
           alert ('Canvas NO disponible. Sorry.')
         }
